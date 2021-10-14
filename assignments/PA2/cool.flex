@@ -110,6 +110,7 @@ EOL             [\n]
   */
 
 [\"] {
+  cout << "BEGIN STRING" << endl;
   string_buf_ptr = string_buf;
   BEGIN(STRING);
 }
@@ -123,7 +124,16 @@ EOL             [\n]
   BEGIN(STRING_ESCAPE);
 }
 
-<STRING_ESCAPE>[.] {
+<STRING>. {
+  cout << "-" << endl;
+  if(string_buf_ptr == string_buf + MAX_STR_CONST) {
+    cool_yylval.error_msg = "Too long string length";
+    return (ERROR);
+  }
+  *(string_buf_ptr++) = yytext[0];
+}
+
+<STRING_ESCAPE>. {
   char_tmp = yytext[0];
   switch(char_tmp){
     case 'n':
