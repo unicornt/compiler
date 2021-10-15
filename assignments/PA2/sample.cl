@@ -3,5 +3,8 @@
    X's respresent live cells, dots represent dead cells,
    no error checking is done *)
 CLass CellularAutomaton inherits IO {
-   "ajgdkjfglksdjflkajfkd flskjflsd\n\n\n\n\b\tfsdfsfdsf"
+   "ajgdkjfglksdjflkajfkd flskjflsd\n\n\n\n\b\tfsdfsfdsf\
+adkjalksjlfkds"
 }
+
+*)

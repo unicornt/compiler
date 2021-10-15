@@ -46,6 +46,7 @@ extern YYSTYPE cool_yylval;
 
 int comment_dep;
 char char_tmp;
+int skip_char;
 
 %}
 
@@ -58,12 +59,30 @@ char char_tmp;
 %x STRING
 %x STRING_ESCAPE
 DARROW          =>
-OBJECT          [A-Za-z_][A-Za-z0-9_]*
-TYPE            [A-Z_][A-Z_]*
+DIGIT           [0-9]+
+OBJECT          [a-z_][A-Za-z0-9_]*
+TYPE            [A-Z_][A-Za-z0-9_]*
 WHITESPACE      [ \t\f\r\v]
 CLASS           (?i:class)
-INHERITS        (?i:INHERITS)
-EOL             [\n]
+ELSE            (?i:else)
+FI              (?i:fi)
+IF              (?i:if)
+THEN            (?i:then)
+IN              (?i:in)
+INHERITS        (?i:inherits)
+LET             (?i:let)
+LOOP            (?i:loop)
+POOL            (?i:pool)
+WHILE           (?i:while)
+CASE            (?i:case)
+ESAC            (?i:esac)
+OF              (?i:of)
+NEW             (?i:new)
+ISVOID          (?i:isvoid)
+ASSIGN          <-
+NOT             (?i:not)
+LE              <=
+EOL             [(\r)?\n]
 
 %%
 
@@ -74,11 +93,22 @@ EOL             [\n]
   comment_dep += 1;
   BEGIN(COMMENT);
 }
+
+[(|)] {
+  return yytext[0];
+}
+
 <COMMENT>"*)" {
   comment_dep -= 1;
   if(comment_dep == 0)
     BEGIN(INITIAL);
 }
+
+"*)" {
+  cool_yylval.error_msg = "Unmatched *)";
+  return (ERROR);
+}
+
 <COMMENT><<EOF>> {
   cool_yylval.error_msg = "EOF in comment";
   BEGIN(INITIAL);
@@ -93,14 +123,35 @@ EOL             [\n]
   *  The multiple-character operators.
   */
 {DARROW}		{ return (DARROW); }
+{ASSIGN}    { return (ASSIGN); }
+{LE}        { return (LE); }
 
  /*
   * Keywords are case-insensitive except for the values true and false,
   * which must begin with a lower-case letter.
   */
 {CLASS}     { return (CLASS); }
+{ELSE}      { return (ELSE); }
+{FI}        { return (FI); }
+{IF}        { return (IF); }
+{IN}        { return (IN); }
 {INHERITS}  { return (INHERITS); }
-
+{LET}       { return (LET); }
+{LOOP}      { return (LOOP); }
+{POOL}      { return (POOL); }
+{THEN}      { return (THEN); }
+{WHILE}     { return (WHILE); }
+{CASE}      { return (CASE); }
+{ESAC}      { return (ESAC); }
+{OF}        { return (OF); }
+{NEW}       { return (NEW); }
+{ISVOID}    { return (ISVOID); }
+{NOT}       { return (NOT); }
+{ELSE}      { return (ELSE); }
+{DIGIT}     {
+  cool_yylval.symbol = inttable.add_string(yytext, yyleng);
+  return (INT_CONST);
+}
 
  /*
   *  String constants (C syntax)
@@ -110,34 +161,74 @@ EOL             [\n]
   */
 
 [\"] {
-  cout << "BEGIN STRING" << endl;
   string_buf_ptr = string_buf;
+  skip_char = 0;
   BEGIN(STRING);
 }
 
 <STRING>[\"] {
-  cout << "END STRING" << endl;
-  BEGIN(INITIAL);
+  if(skip_char == 0){
+    *string_buf_ptr = '\0';
+    cool_yylval.symbol = inttable.add_string(string_buf);
+    BEGIN(INITIAL);
+    return (STR_CONST);
+  }
+  else {
+    BEGIN(INITIAL);
+  }
 }
 
 <STRING>[\\] {
   BEGIN(STRING_ESCAPE);
 }
 
+<STRING><<EOF>> {
+  cool_yylval.error_msg = "EOF in string constant";
+  BEGIN(INITIAL);
+  return (ERROR);
+}
+
+<STRING>{EOL} {
+  cool_yylval.error_msg = "Unterminated string constant";
+  BEGIN(INITIAL);
+  return (ERROR);
+}
+
+<STRING>'\0' {
+  cool_yylval.error_msg = "String contains null character";
+  skip_char = 1;
+  return (ERROR);
+}
+
 <STRING>. {
-  cout << "-" << endl;
+  if(skip_char == 0) {
+    if(string_buf_ptr == string_buf + MAX_STR_CONST) {
+      cool_yylval.error_msg = "String constant too long";
+      skip_char = 1;
+      return (ERROR);
+    }
+    *(string_buf_ptr++) = yytext[0];
+  }
+}
+
+<STRING_ESCAPE>{EOL} {
+  curr_lineno += 1;
   if(string_buf_ptr == string_buf + MAX_STR_CONST) {
-    cool_yylval.error_msg = "Too long string length";
+    cool_yylval.error_msg = "String constant too long";
+    skip_char = 1;
     return (ERROR);
   }
-  *(string_buf_ptr++) = yytext[0];
+  *(string_buf_ptr++) = '\n';
+  BEGIN(STRING);
 }
 
 <STRING_ESCAPE>. {
   char_tmp = yytext[0];
+  // cout << char_tmp << endl;
   switch(char_tmp){
     case 'n':
       char_tmp = '\n';
+      curr_lineno += 1;
       break;
     case 'b':
       char_tmp = '\b';
@@ -151,20 +242,23 @@ EOL             [\n]
     default:
       break;
   }
-  if(string_buf_ptr == string_buf + MAX_STR_CONST) {
-    cool_yylval.error_msg = "Too long string length";
-    return (ERROR);
+  if(skip_char == 0) {
+    if(string_buf_ptr == string_buf + MAX_STR_CONST) {
+      cool_yylval.error_msg = "String constant too long";
+      skip_char = 1;
+      return (ERROR);
+    }
+    *(string_buf_ptr++) = char_tmp;
   }
-  *(string_buf_ptr++) = char_tmp;
   BEGIN(STRING);
 }
 
-{TYPE}    { 
+{TYPE}    {
   cool_yylval.symbol = idtable.add_string(yytext, yyleng);
   return TYPEID; 
 }
 
-{OBJECT}    { 
+{OBJECT}    {
   cool_yylval.symbol = idtable.add_string(yytext, yyleng);
   return OBJECTID; 
 }
@@ -172,6 +266,11 @@ EOL             [\n]
 
 {EOL} {
   curr_lineno += 1;
+}
+
+[\[\]\'>] {
+  cool_yylval.error_msg = yytext;
+  return (ERROR);
 }
 
 . {
