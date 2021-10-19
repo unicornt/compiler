@@ -8,7 +8,8 @@ class CellularAutomaton inherits IO {
             "123\\0"
             "123\\\0"
             "123\\\\0"
-
+            tRuE
+            fAlsE
             self;
         }
     };

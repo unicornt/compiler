@@ -153,6 +153,16 @@ EOL             [(\r)?\n]
   return (INT_CONST);
 }
 
+t[Rr][Uu][Ee] {
+  cool_yylval.boolean = true;
+  return (BOOL_CONST);
+}
+
+f[Aa][Ll][Ss][Ee] {
+  cool_yylval.boolean = false;
+  return (BOOL_CONST);
+}
+
  /*
   *  String constants (C syntax)
   *  Escape sequence \c is accepted for all characters c. Except for 
@@ -278,3 +288,4 @@ EOL             [(\r)?\n]
 }
 
 %%
+ 
