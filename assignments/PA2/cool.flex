@@ -104,6 +104,10 @@ EOL             [(\r)?\n]
     BEGIN(INITIAL);
 }
 
+<COMMENT>"(*" {
+  comment_dep += 1;
+}
+
 "*)" {
   cool_yylval.error_msg = "Unmatched *)";
   return (ERROR);
@@ -217,7 +221,7 @@ f[Aa][Ll][Ss][Ee] {
 
 <STRING>. {
   if(skip_char == 0) {
-    if(string_buf_ptr == string_buf + MAX_STR_CONST) {
+    if(string_buf_ptr == string_buf + MAX_STR_CONST - 1) {
       cool_yylval.error_msg = "String constant too long";
       skip_char = 1;
       return (ERROR);
@@ -228,7 +232,7 @@ f[Aa][Ll][Ss][Ee] {
 
 <STRING_ESCAPE>{EOL} {
   curr_lineno += 1;
-  if(string_buf_ptr == string_buf + MAX_STR_CONST) {
+  if(string_buf_ptr == string_buf + MAX_STR_CONST - 1) {
     cool_yylval.error_msg = "String constant too long";
     skip_char = 1;
     return (ERROR);
@@ -260,7 +264,7 @@ f[Aa][Ll][Ss][Ee] {
       break;
   }
   if(skip_char == 0) {
-    if(string_buf_ptr == string_buf + MAX_STR_CONST) {
+    if(string_buf_ptr == string_buf + MAX_STR_CONST - 1) {
       cool_yylval.error_msg = "String constant too long";
       skip_char = 1;
       return (ERROR);
@@ -285,7 +289,7 @@ f[Aa][Ll][Ss][Ee] {
   curr_lineno += 1;
 }
 
-[\[\]\'>] {
+[\[\]\'>&] {
   cool_yylval.error_msg = yytext;
   return (ERROR);
 }
