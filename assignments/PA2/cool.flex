@@ -199,9 +199,14 @@ f[Aa][Ll][Ss][Ee] {
 }
 
 <STRING>{EOL} {
-  cool_yylval.error_msg = "Unterminated string constant";
-  BEGIN(INITIAL);
-  return (ERROR);
+  curr_lineno += 1;
+  if(skip_char == 0){
+    cool_yylval.error_msg = "Unterminated string constant";
+    BEGIN(INITIAL);
+    return (ERROR);
+  }
+  else
+    BEGIN(INITIAL);
 }
 
 <STRING>'\0' {
