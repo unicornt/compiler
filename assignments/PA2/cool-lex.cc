@@ -653,8 +653,8 @@ static const flex_int16_t yy_rule_linenum[44] =
        93,   98,  102,  108,  118,  126,  127,  128,  134,  135,
       136,  137,  138,  139,  140,  141,  142,  143,  144,  145,
       146,  147,  148,  149,  150,  151,  152,  157,  162,  174,
-      180,  192,  202,  213,  219,  230,  241,  271,  276,  280,
-      282,  286,  291
+      180,  192,  202,  213,  219,  230,  241,  274,  279,  283,
+      285,  289,  294
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -1392,6 +1392,9 @@ YY_RULE_SETUP
     case '\\':
       char_tmp = '\\';
       break;
+    case 'f':
+      char_tmp = '\f';
+      break;
     default:
       break;
   }
@@ -1408,7 +1411,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 271 "cool.flex"
+#line 274 "cool.flex"
 {
   cool_yylval.symbol = idtable.add_string(yytext, yyleng);
   return TYPEID; 
@@ -1416,7 +1419,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 276 "cool.flex"
+#line 279 "cool.flex"
 {
   cool_yylval.symbol = idtable.add_string(yytext, yyleng);
   return OBJECTID; 
@@ -1424,20 +1427,20 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 280 "cool.flex"
+#line 283 "cool.flex"
 {}
 	YY_BREAK
 case 41:
 /* rule 41 can match eol */
 YY_RULE_SETUP
-#line 282 "cool.flex"
+#line 285 "cool.flex"
 {
   curr_lineno += 1;
 }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 286 "cool.flex"
+#line 289 "cool.flex"
 {
   cool_yylval.error_msg = yytext;
   return (ERROR);
@@ -1445,17 +1448,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 291 "cool.flex"
+#line 294 "cool.flex"
 {
   return yytext[0];
 }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 295 "cool.flex"
+#line 298 "cool.flex"
 ECHO;
 	YY_BREAK
-#line 1459 "cool-lex.cc"
+#line 1462 "cool-lex.cc"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STRING_ESCAPE):
 	yyterminate();
@@ -2605,6 +2608,6 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 295 "cool.flex"
+#line 298 "cool.flex"
 
  

@@ -253,6 +253,9 @@ f[Aa][Ll][Ss][Ee] {
     case '\\':
       char_tmp = '\\';
       break;
+    case 'f':
+      char_tmp = '\f';
+      break;
     default:
       break;
   }
