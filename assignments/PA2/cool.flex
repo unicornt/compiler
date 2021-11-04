@@ -243,7 +243,6 @@ f[Aa][Ll][Ss][Ee] {
   switch(char_tmp){
     case 'n':
       char_tmp = '\n';
-      curr_lineno += 1;
       break;
     case 'b':
       char_tmp = '\b';
