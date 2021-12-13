@@ -8,10 +8,11 @@
 //
 //////////////////////////////////////////////////////////
 
-
+#include "symtab.h"
 #include "tree.h"
 #include "cool-tree.handcode.h"
 
+class ClassTable;
 
 // define the class for phylum
 // define simple phylum - Program
@@ -49,6 +50,7 @@ class Feature_class : public tree_node {
 public:
    tree_node *copy()		 { return copy_Feature(); }
    virtual Feature copy_Feature() = 0;
+   virtual bool isself() = 0;
 
 #ifdef Feature_EXTRAS
    Feature_EXTRAS
@@ -208,7 +210,7 @@ public:
       name = a1;
       type_decl = a2;
       init = a3;
-   }
+   }  
    Feature copy_Feature();
    void dump(ostream& stream, int n);
 

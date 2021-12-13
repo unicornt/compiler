@@ -1,0 +1,15 @@
+OK
+install basic classes
+build inheritance
+build class table
+Object is child of _no_class
+IO is child of Object
+Int is child of Object
+Bool is child of Object
+String is child of Object
+A is child of B
+B is child of A
+start check cycle
+check cycle
+false check
+finish build
