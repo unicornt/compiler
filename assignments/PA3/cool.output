@@ -1,7 +1,7 @@
 Terminals unused in grammar
 
-    ERROR
-    ID
+   ERROR
+   ID
 
 
 Grammar
@@ -78,93 +78,84 @@ Grammar
 
 Terminals, with rules where they appear
 
-    $end (0) 0
-    '(' (40) 10 11 30 31 32 33 34 51
-    ')' (41) 10 11 30 31 32 33 34 51
-    '*' (42) 44
-    '+' (43) 42
-    ',' (44) 15 17 24 25 26
-    '-' (45) 43
-    '.' (46) 30 31 32 33
-    '/' (47) 45
-    ':' (58) 10 11 12 13 16 22 23 24 25 27 28
-    ';' (59) 4 5 6 8 9 19 20 21 27 28
-    '<' (60) 47
-    '=' (61) 49
-    '@' (64) 32 33
-    '{' (123) 5 6 10 11 37
-    '}' (125) 5 6 10 11 37
-    '~' (126) 46
-    error (256) 4 21 26
-    CLASS (258) 5 6
-    ELSE (259) 35
-    FI (260) 35
-    IF (261) 35
-    IN (262) 22 23
-    INHERITS (263) 6
-    LET (264) 38
-    LOOP (265) 36
-    POOL (266) 36
-    THEN (267) 35
-    WHILE (268) 36
-    CASE (269) 39
-    ESAC (270) 39
-    OF (271) 39
-    DARROW (272) 27 28
-    NEW (273) 40
-    ISVOID (274) 41
-    STR_CONST <symbol> (275) 54
-    INT_CONST <symbol> (276) 53
-    BOOL_CONST <boolean> (277) 55
-    TYPEID <symbol> (278) 5 6 10 11 12 13 16 22 23 24 25 27 28 32 33 40
-    OBJECTID <symbol> (279) 10 11 12 13 16 22 23 24 25 27 28 29 30 31 32 33 34 52
-    ASSIGN (280) 13 23 25 29
-    NOT (281) 50
-    LE (282) 48
-    ERROR (283)
-    ID (285)
+$end (0) 0
+'(' (40) 10 11 30 31 32 33 34 51
+')' (41) 10 11 30 31 32 33 34 51
+'*' (42) 44
+'+' (43) 42
+',' (44) 15 17 24 25 26
+'-' (45) 43
+'.' (46) 30 31 32 33
+'/' (47) 45
+':' (58) 10 11 12 13 16 22 23 24 25 27 28
+';' (59) 4 5 6 8 9 19 20 21 27 28
+'<' (60) 47
+'=' (61) 49
+'@' (64) 32 33
+'{' (123) 5 6 10 11 37
+'}' (125) 5 6 10 11 37
+'~' (126) 46
+error (256) 4 21 26
+CLASS (258) 5 6
+ELSE (259) 35
+FI (260) 35
+IF (261) 35
+IN (262) 22 23
+INHERITS (263) 6
+LET (264) 38
+LOOP (265) 36
+POOL (266) 36
+THEN (267) 35
+WHILE (268) 36
+CASE (269) 39
+ESAC (270) 39
+OF (271) 39
+DARROW (272) 27 28
+NEW (273) 40
+ISVOID (274) 41
+STR_CONST (275) 54
+INT_CONST (276) 53
+BOOL_CONST (277) 55
+TYPEID (278) 5 6 10 11 12 13 16 22 23 24 25 27 28 32 33 40
+OBJECTID (279) 10 11 12 13 16 22 23 24 25 27 28 29 30 31 32 33 34 52
+ASSIGN (280) 13 23 25 29
+NOT (281) 50
+LE (282) 48
+ERROR (283)
+ID (285)
 
 
 Nonterminals, with rules where they appear
 
-    $accept (46)
-        on left: 0
-    program <program> (47)
-        on left: 1
-        on right: 0
-    class_list <classes> (48)
-        on left: 2 3 4
-        on right: 1 3 4
-    class <class_> (49)
-        on left: 5 6
-        on right: 2 3
-    feature_list <features> (50)
-        on left: 7 8 9
-        on right: 5 6 8 9
-    feature <feature> (51)
-        on left: 10 11 12 13
-        on right: 8
-    formal_list <formals> (52)
-        on left: 14 15
-        on right: 10 15
-    formal <formal> (53)
-        on left: 16
-        on right: 14 15
-    expr_list <expressions> (54)
-        on left: 17 18
-        on right: 17 31 33 34
-    expr_list2 <expressions> (55)
-        on left: 19 20 21
-        on right: 20 21 37
-    let <expression> (56)
-        on left: 22 23 24 25 26
-        on right: 24 25 26 38
-    branch_list <cases> (57)
-        on left: 27 28
-        on right: 28 39
-    expr <expression> (58)
-        on left: 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55
-        on right: 10 11 13 17 18 19 20 22 23 25 27 28 29 30 31 32 33 35 36 39 41 42 43 44 45 46 47 48 49 50 51
+$accept (46)
+    on left: 0
+program (47)
+    on left: 1, on right: 0
+class_list (48)
+    on left: 2 3 4, on right: 1 3 4
+class (49)
+    on left: 5 6, on right: 2 3
+feature_list (50)
+    on left: 7 8 9, on right: 5 6 8 9
+feature (51)
+    on left: 10 11 12 13, on right: 8
+formal_list (52)
+    on left: 14 15, on right: 10 15
+formal (53)
+    on left: 16, on right: 14 15
+expr_list (54)
+    on left: 17 18, on right: 17 31 33 34
+expr_list2 (55)
+    on left: 19 20 21, on right: 20 21 37
+let (56)
+    on left: 22 23 24 25 26, on right: 24 25 26 38
+branch_list (57)
+    on left: 27 28, on right: 28 39
+expr (58)
+    on left: 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46
+    47 48 49 50 51 52 53 54 55, on right: 10 11 13 17 18 19 20 22 23
+    25 27 28 29 30 31 32 33 35 36 39 41 42 43 44 45 46 47 48 49 50
+    51
 
 
 State 0

@@ -13,7 +13,7 @@ CLASS PRE{
     };
 };
 
-
+(*
 class C {
     h(n:Int):Int {
         {
@@ -23,7 +23,7 @@ class C {
     };
 
 };
-
+*)
 (*
     检测多个feature/多个expr的情况
 *)

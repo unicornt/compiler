@@ -56,36 +56,78 @@ void dump_with_types(ostream&, int);
 
 #define Class__EXTRAS                   \
 virtual Symbol get_filename() = 0;      \
-virtual void dump_with_types(ostream&,int) = 0; 
-
+virtual void dump_with_types(ostream&,int) = 0; \
+virtual Symbol getparent() = 0; \
+virtual Symbol getname() = 0; \
+virtual Features getfeatures() = 0;  \
+virtual void type_checking(SymbolTable<Symbol, Entry> *, SymbolTable<Symbol, Feature_class> *, ClassTable*) = 0;
 
 #define class__EXTRAS                                 \
 Symbol get_filename() { return filename; }             \
 void dump_with_types(ostream&,int);                    
 
+#define Class__SHARED_EXTRAS \
+Symbol getparent() { return parent;} \
+Symbol getname() { return name;} \
+Features getfeatures() { return features;}   \
+void type_checking(SymbolTable<Symbol, Entry> *, SymbolTable<Symbol, Feature_class> *, ClassTable*);
 
 #define Feature_EXTRAS                                        \
-virtual void dump_with_types(ostream&,int) = 0; 
+virtual void dump_with_types(ostream&,int) = 0;  \
+virtual bool attr_redefine(SymbolTable<Symbol, Entry>*) = 0;     \
+virtual Formals getformals() = 0; \
+virtual int method_redefine(SymbolTable<Symbol, Feature_class>*, Symbol, ClassTable *) = 0;  \
+virtual Symbol gettype() = 0;     \
+virtual void add_method(SymbolTable<Symbol, Feature_class> *) = 0;    \
+virtual void add_attr(SymbolTable<Symbol, Entry> *) = 0;			\
+virtual Symbol getname() = 0;				\
+virtual void type_checking(SymbolTable<Symbol, Entry> *, SymbolTable<Symbol, Feature_class> *, ClassTable*, Class_) = 0;
 
 
 #define Feature_SHARED_EXTRAS                                       \
-void dump_with_types(ostream&,int);    
+void dump_with_types(ostream&,int);  \
+Symbol getname() { return name;}	\
+bool isself();				\
+void type_checking(SymbolTable<Symbol, Entry> *, SymbolTable<Symbol, Feature_class> *, ClassTable*, Class_);
 
+#define attr_EXTRAS \
+Symbol gettype() { return type_decl;}  \
+Formals getformals() { return NULL; } \
+bool attr_redefine(SymbolTable<Symbol, Entry> *);      \
+int method_redefine(SymbolTable<Symbol, Feature_class> *, Symbol, ClassTable*);      \
+void add_method(SymbolTable<Symbol, Feature_class> *);  \
+void add_attr(SymbolTable<Symbol, Entry> *);
 
-
-
+#define method_EXTRAS \
+Symbol gettype() { return return_type;}  \
+Formals getformals() { return formals;}   \
+bool attr_redefine(SymbolTable<Symbol, Entry> *);   \
+int method_redefine(SymbolTable<Symbol, Feature_class> *, Symbol, ClassTable*);     \
+void add_method(SymbolTable<Symbol, Feature_class> *);  \
+void add_attr(SymbolTable<Symbol, Entry> *);
 
 #define Formal_EXTRAS                              \
-virtual void dump_with_types(ostream&,int) = 0;
+virtual void dump_with_types(ostream&,int) = 0;    \
+virtual Symbol getname() = 0;             \
+virtual Symbol gettype() = 0;
 
 
 #define formal_EXTRAS                           \
-void dump_with_types(ostream&,int);
+void dump_with_types(ostream&,int);             \
+Symbol getname() { return name; }              \
+Symbol gettype() { return type_decl; }
 
 
 #define Case_EXTRAS                             \
-virtual void dump_with_types(ostream& ,int) = 0;
+virtual void dump_with_types(ostream& ,int) = 0;   \
+virtual Symbol getname() = 0;  \
+virtual Symbol gettype() = 0;  \
+virtual Expression getexpr() = 0;
 
+#define Case_SHARED_EXTRAS \
+Symbol getname() { return name; }    \
+Symbol gettype() { return type_decl; }  \
+Expression getexpr() { return expr; }
 
 #define branch_EXTRAS                                   \
 void dump_with_types(ostream& ,int);
@@ -97,9 +139,11 @@ Symbol get_type() { return type; }           \
 Expression set_type(Symbol s) { type = s; return this; } \
 virtual void dump_with_types(ostream&,int) = 0;  \
 void dump_type(ostream&, int);               \
-Expression_class() { type = (Symbol) NULL; }
+Expression_class() { type = (Symbol) NULL; }  \
+virtual Expression type_checking(SymbolTable<Symbol, Entry> *, SymbolTable<Symbol, Feature_class> *, ClassTable* , Class_) = 0;
 
 #define Expression_SHARED_EXTRAS           \
-void dump_with_types(ostream&,int); 
+void dump_with_types(ostream&,int);  \
+Expression type_checking(SymbolTable<Symbol, Entry> *, SymbolTable<Symbol, Feature_class> *, ClassTable* , Class_);
 
 #endif
