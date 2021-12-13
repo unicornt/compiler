@@ -289,7 +289,7 @@ f[Aa][Ll][Ss][Ee] {
   curr_lineno += 1;
 }
 
-[\[\]\'>&] {
+[\[\]\'>&!@#$%^] {
   cool_yylval.error_msg = yytext;
   return (ERROR);
 }

@@ -8,6 +8,7 @@
  *)
 
 (* no error *)
+
 class A {
 };
 
@@ -26,4 +27,18 @@ Class D inherts A {
 (* error:  closing brace is missing *)
 Class E inherits A {
 ;
+
+(* no error*)
+Class F inherits A {
+};
+
+Class H inherits B {
+    k <- ;
+};
+
+Class G {
+    k <- 1;;;;;;
+    h <- 1;
+}
+
 

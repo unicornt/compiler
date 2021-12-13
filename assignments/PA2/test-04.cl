@@ -3,4 +3,8 @@ class CellularAutomaton inherits IO {
    
     init(map : String) : SELF_TYPE {
         {
-            population_map <- "mapdlsjfkdjflskjfldsjfldsfjlskdjfksdjlfjsd
+            population_map <- "mapdlsjfkdjflskjfldsjfldsfjlskdjfksdjlfjsd\
+            jdlfjlksdjflkdsjlfksjfl"
+            "jakdfljlskjfkldjfklsjdfklsjflkdd
+            dfjlksjdflksdjfklsdjfkl"
+            "ksjlfldksjfklsjflkdsjflks
