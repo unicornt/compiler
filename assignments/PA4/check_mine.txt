@@ -1,143 +1,300 @@
-OK
-install basic classes
-build inheritance
-build class table
-Object is child of _no_class
-IO is child of Object
-Int is child of Object
-Bool is child of Object
-String is child of Object
-C is child of Object
-D is child of C
-Main is child of Object
-start check cycle
-check cycle
-finish build
-start coping build
-Object
-Object add ancestor 
-IO
-Object rec add features _no_class
-IO add ancestor 
-Int
-Object rec add features _no_class
-Int add ancestor 
-Bool
-Object rec add features _no_class
-Bool add ancestor 
-String
-Object rec add features _no_class
-String add ancestor 
-C
-Object rec add features _no_class
-C add ancestor 
-D
-C rec add features Object
-Object rec add features _no_class
-D add ancestor 
-Main
-Object rec add features _no_class
-Main add ancestor 
-ClassTable type checking
-type checking: Class C
-class__class type checking
-type checking: Attribute a
-type checking: no expr 
-type checking: Attribute b
-type checking: no expr 
-type checking: Method init
-type checking: block 
-type checking: assign 
-type checking: object x
-check inheritance Int  Int
-type checking: assign 
-type checking: object y
-check inheritance Bool  Bool
-type checking: object self
-expr type is self type
-check inheritance : C C
-check inheritance C  C
-type checking: Method abort
-type checking: no expr 
-check inheritance : _no_type Object
-check inheritance _no_type  Object
-type checking: Method type_name
-type checking: no expr 
-check inheritance : _no_type String
-check inheritance _no_type  String
-type checking: Method copy
-type checking: no expr 
-check inheritance : _no_type C
-check inheritance _no_type  C
-
-
-type checking: Class D
-class__class type checking
-type checking: Method init
-type checking: block 
-type checking: assign 
-type checking: plus 
-type checking: object x
-type checking: int const 
-check inheritance Int  Int
-type checking: assign 
-type checking: object y
-check inheritance Bool  Bool
-type checking: object self
-expr type is self type
-check inheritance : D C
-check inheritance D  C
-check inheritance C  C
-type checking: Attribute a
-type checking: no expr 
-type checking: Attribute b
-type checking: no expr 
-type checking: Method abort
-type checking: no expr 
-check inheritance : _no_type Object
-check inheritance _no_type  Object
-type checking: Method type_name
-type checking: no expr 
-check inheritance : _no_type String
-check inheritance _no_type  String
-type checking: Method copy
-type checking: no expr 
-check inheritance : _no_type D
-check inheritance _no_type  D
-
-
-type checking: Class Main
-class__class type checking
-type checking: Attribute a
-type checking: no expr 
-type checking: Attribute b
-type checking: no expr 
-type checking: Method main
-type checking: block 
-type checking: static dispatch 
-type checking: object b
-check inheritance D  C
-check inheritance C  C
-type checking: int const 
-check inheritance Int  Int
-type checking: bool const 
-check inheritance Bool  Bool
-type checking: assign 
-type checking: int const 
-check inheritance Int  Int
-check inheritance : Int Int
-check inheritance Int  Int
-type checking: Method abort
-type checking: no expr 
-check inheritance : _no_type Object
-check inheritance _no_type  Object
-type checking: Method type_name
-type checking: no expr 
-check inheritance : _no_type String
-check inheritance _no_type  String
-type checking: Method copy
-type checking: no expr 
-check inheritance : _no_type Main
-check inheritance _no_type  Main
-
-
+#1
+_program
+  #1
+  _class
+    C
+    Object
+    "typcase_check.cl"
+    (
+    #2
+    _attr
+      a
+      Int
+      #0
+      _no_expr
+      : _no_type
+    #3
+    _attr
+      b
+      Bool
+      #0
+      _no_expr
+      : _no_type
+    #4
+    _method
+      init
+      #4
+      _formal
+        x
+        Int
+      #4
+      _formal
+        y
+        Bool
+      C
+      #5
+      _block
+        #6
+        _assign
+          a
+          #6
+          _object
+            x
+          : Int
+        : Int
+        #7
+        _assign
+          b
+          #7
+          _object
+            y
+          : Bool
+        : Bool
+        #8
+        _object
+          self
+        : SELF_TYPE
+      : SELF_TYPE
+    )
+  #13
+  _class
+    D
+    Object
+    "typcase_check.cl"
+    (
+    #14
+    _attr
+      a
+      D
+      #0
+      _no_expr
+      : _no_type
+    #15
+    _method
+      init
+      Object
+      #16
+      _block
+        #17
+        _loop
+          #17
+          _lt
+            #17
+            _int
+              7
+            : Int
+            #17
+            _int
+              5
+            : Int
+          : Bool
+          #17
+          _plus
+            #17
+            _int
+              1
+            : Int
+            #17
+            _int
+              1
+            : Int
+          : Int
+        : Object
+      : Object
+    )
+  #22
+  _class
+    H
+    Object
+    "typcase_check.cl"
+    (
+    #23
+    _attr
+      a
+      C
+      #0
+      _no_expr
+      : _no_type
+    #24
+    _attr
+      b
+      D
+      #0
+      _no_expr
+      : _no_type
+    )
+  #27
+  _class
+    Main
+    Object
+    "typcase_check.cl"
+    (
+    #28
+    _attr
+      a
+      Int
+      #0
+      _no_expr
+      : _no_type
+    #29
+    _attr
+      b
+      C
+      #0
+      _no_expr
+      : _no_type
+    #30
+    _method
+      main
+      Int
+      #31
+      _block
+        #32
+        _assign
+          a
+          #32
+          _int
+            7
+          : Int
+        : Int
+        #33
+        _typcase
+          #33
+          _object
+            b
+          : C
+          #34
+          _branch
+            c
+            C
+            #34
+            _dispatch
+              #34
+              _object
+                c
+              : C
+              init
+              (
+              #34
+              _int
+                3
+              : Int
+              #34
+              _bool
+                1
+              : Bool
+              )
+            : C
+          #35
+          _branch
+            d
+            Int
+            #35
+            _plus
+              #35
+              _object
+                d
+              : Int
+              #35
+              _int
+                1
+              : Int
+            : Int
+          #36
+          _branch
+            f
+            Bool
+            #36
+            _comp
+              #36
+              _object
+                f
+              : Bool
+            : Bool
+        : Object
+        #38
+        _typcase
+          #38
+          _loop
+            #38
+            _lt
+              #38
+              _int
+                7
+              : Int
+              #38
+              _int
+                5
+              : Int
+            : Bool
+            #38
+            _plus
+              #38
+              _int
+                1
+              : Int
+              #38
+              _int
+                1
+              : Int
+            : Int
+          : Object
+          #39
+          _branch
+            c
+            C
+            #39
+            _dispatch
+              #39
+              _object
+                c
+              : C
+              init
+              (
+              #39
+              _int
+                3
+              : Int
+              #39
+              _bool
+                1
+              : Bool
+              )
+            : C
+          #40
+          _branch
+            d
+            Int
+            #40
+            _plus
+              #40
+              _object
+                d
+              : Int
+              #40
+              _int
+                1
+              : Int
+            : Int
+          #41
+          _branch
+            f
+            Bool
+            #41
+            _comp
+              #41
+              _object
+                f
+              : Bool
+            : Bool
+        : Object
+        #43
+        _assign
+          a
+          #43
+          _int
+            1
+          : Int
+        : Int
+      : Int
+    )

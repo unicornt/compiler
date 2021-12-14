@@ -4,7 +4,7 @@ _program
   _class
     C
     Object
-    "static_dispatch_1.cl"
+    "typcase_check.cl"
     (
     #2
     _attr
@@ -59,101 +59,239 @@ _program
   #13
   _class
     D
-    C
-    "static_dispatch_1.cl"
+    Object
+    "typcase_check.cl"
     (
     #14
+    _attr
+      a
+      D
+      #0
+      _no_expr
+      : _no_type
+    #15
     _method
       init
-      #14
-      _formal
-        x
-        Int
-      #14
-      _formal
-        y
-        Bool
-      C
-      #15
+      Object
+      #16
       _block
-        #16
-        _assign
-          a
-          #16
-          _plus
-            #16
-            _object
-              x
+        #17
+        _loop
+          #17
+          _lt
+            #17
+            _int
+              7
             : Int
-            #16
+            #17
+            _int
+              5
+            : Int
+          : Bool
+          #17
+          _plus
+            #17
+            _int
+              1
+            : Int
+            #17
             _int
               1
             : Int
           : Int
-        : Int
-        #17
-        _assign
-          b
-          #17
-          _object
-            y
-          : Bool
-        : Bool
-        #18
-        _object
-          self
-        : SELF_TYPE
-      : SELF_TYPE
+        : Object
+      : Object
     )
-  #23
+  #22
   _class
-    Main
+    H
     Object
-    "static_dispatch_1.cl"
+    "typcase_check.cl"
     (
-    #24
+    #23
     _attr
       a
-      Int
+      C
       #0
       _no_expr
       : _no_type
-    #25
+    #24
     _attr
       b
       D
       #0
       _no_expr
       : _no_type
-    #26
+    )
+  #27
+  _class
+    Main
+    Object
+    "typcase_check.cl"
+    (
+    #28
+    _attr
+      a
+      Int
+      #0
+      _no_expr
+      : _no_type
+    #29
+    _attr
+      b
+      C
+      #0
+      _no_expr
+      : _no_type
+    #30
     _method
       main
       Int
-      #27
+      #31
       _block
-        #28
-        _static_dispatch
-          #28
-          _object
-            b
-          : D
-          C
-          init
-          (
-          #28
-          _int
-            3
-          : Int
-          #28
-          _bool
-            1
-          : Bool
-          )
-        : C
-        #29
+        #32
         _assign
           a
-          #29
+          #32
+          _int
+            7
+          : Int
+        : Int
+        #33
+        _typcase
+          #33
+          _object
+            b
+          : C
+          #34
+          _branch
+            c
+            C
+            #34
+            _dispatch
+              #34
+              _object
+                c
+              : C
+              init
+              (
+              #34
+              _int
+                3
+              : Int
+              #34
+              _bool
+                1
+              : Bool
+              )
+            : C
+          #35
+          _branch
+            d
+            Int
+            #35
+            _plus
+              #35
+              _object
+                d
+              : Int
+              #35
+              _int
+                1
+              : Int
+            : Int
+          #36
+          _branch
+            f
+            Bool
+            #36
+            _comp
+              #36
+              _object
+                f
+              : Bool
+            : Bool
+        : Object
+        #38
+        _typcase
+          #38
+          _loop
+            #38
+            _lt
+              #38
+              _int
+                7
+              : Int
+              #38
+              _int
+                5
+              : Int
+            : Bool
+            #38
+            _plus
+              #38
+              _int
+                1
+              : Int
+              #38
+              _int
+                1
+              : Int
+            : Int
+          : Object
+          #39
+          _branch
+            c
+            C
+            #39
+            _dispatch
+              #39
+              _object
+                c
+              : C
+              init
+              (
+              #39
+              _int
+                3
+              : Int
+              #39
+              _bool
+                1
+              : Bool
+              )
+            : C
+          #40
+          _branch
+            d
+            Int
+            #40
+            _plus
+              #40
+              _object
+                d
+              : Int
+              #40
+              _int
+                1
+              : Int
+            : Int
+          #41
+          _branch
+            f
+            Bool
+            #41
+            _comp
+              #41
+              _object
+                f
+              : Bool
+            : Bool
+        : Object
+        #43
+        _assign
+          a
+          #43
           _int
             1
           : Int

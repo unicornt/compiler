@@ -93,7 +93,7 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 
     all_classes = append_Classes(all_classes, classes);
     class_number = all_classes->len();
-    cout << "install basic classes" << std::endl;
+    // cout << "install basic classes" << std::endl;
     name2id = new SymbolTable<Symbol, int>();
     name2id -> enterscope();
     inheritance = new SymbolTable<int, int>();
@@ -101,7 +101,7 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
     name2class = new SymbolTable<Symbol, Class__class>();
     name2class -> enterscope();
 
-    cout << "build inheritance" << std::endl;
+    // cout << "build inheritance" << std::endl;
     // build inheritance graph
     Class_ class_i;
     Symbol name_i, parname;
@@ -112,7 +112,7 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
         name_i = class_i->getname();
         if(name2id->lookup(name_i) != NULL) {
             // redefine
-            semant_error(class_i) << "Class " << name_i << " redefine" << std::endl;
+            semant_error(class_i) << "Class " << name_i << " was previously defined" << std::endl;
         }
         else {
             name2id -> addid(name_i, new int(j++));
@@ -123,7 +123,7 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
         semant_error() << "Class Main is not defined" << std::endl;
     }
     int *par_i, *id;
-    cout << "build class table" << std::endl;
+    // cout << "build class table" << std::endl;
     for(int i = all_classes->first(), j = 0; all_classes->more(i); i = all_classes->next(i)) {
         class_i = all_classes->nth(i);
         name_i = class_i->getname();
@@ -131,47 +131,49 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
         par_i = name2id -> lookup(parname);
         id = name2id -> lookup(name_i);
         if(par_i == NULL) {
-            semant_error(class_i) << "Class " << name_i << ": parent class " << parname << "not define" << std::endl;
+            semant_error(class_i) << "Class " << name_i << " inherits from an undefined class " << parname << std::endl;
         }
         else {
-            cout << name_i << " is child of " << parname << std::endl;
-            if(id == NULL) cout << "???" << std::endl;
+            // cout << name_i << " is child of " << parname << std::endl;
+            // if(id == NULL) // cout << "???" << std::endl;
             inheritance->addid(*id, par_i); 
         }
     }
 
-    cout << "start check cycle" << std::endl;
+    // cout << "start check cycle" << std::endl;
     // check cycle
     bool *vis = new bool[class_number + 5];
     bool *flag = new bool[class_number + 5];
-    cout << "check cycle" << std::endl;
+    // cout << "check cycle" << std::endl;
     for(int i = 0; i < class_number; i++) {
         for(int j = 0; j < class_number; j++) {
             vis[j] = false;
             flag[j] = false;
         }
         Symbol name = all_classes->nth(i)->getname();
+        // cout << "check " << name << std::endl;
         int *id = name2id->lookup(name);
         if(dfs_check(*id, vis, flag) == true) {
-            cout << "false check" << std::endl;
-            semant_error() << "Class " << name << ", or an ancestor of " << name << ", is involved in an inheritance cycle." << std::endl;
+            // cout << "false check" << std::endl;
+            semant_error(all_classes->nth(i)) << "Class " << name << ", or an ancestor of " << name << ", is involved in an inheritance cycle." << std::endl;
         }
-        // cout << std::endl;
+        // // cout << std::endl;
     }
 
-    cout << "finish build" << std::endl;
+    // cout << "finish build" << std::endl;
 
     
 }
 
 bool ClassTable::dfs_check(int id, bool *vis, bool *flag) {
-    if(vis[id] == true) return false;
     vis[id] = true;
     flag[id] = true;
     int *par_id = inheritance -> lookup(id);
     if(par_id != NULL) {
         // cout << "dfs par id: " << *par_id << std::endl;
         if(flag[*par_id] == true)
+            return true;
+        if(vis[*par_id] == true)
             return true;
         if(dfs_check(*par_id, vis, flag))
             return true;
@@ -403,14 +405,14 @@ void ClassTable::add_all_features(Class_ curr_class, SymbolTable<Symbol, Entry> 
     for(int i = features->first(); features->more(i); i = features->next(i)) {
         curr_feature = features->nth(i);
         if(curr_feature->isself()) {
-            semant_error(curr_class->get_filename(), curr_feature) << "self is not allowed to appear in an attribute binding.\n";
+            semant_error(curr_class->get_filename(), curr_feature) << "'self' cannot be the name of an attribute\n";
         }
         Symbol curr_type = curr_feature->gettype();
         if(check_typerror(curr_class->get_filename(), curr_type, curr_feature)) {
             // add attr & method
             Symbol feature_name = curr_feature->getname();
             if(curr_feature->attr_redefine(curr_attr) == true) {
-                semant_error(curr_class->get_filename(), curr_feature) << "Attribute " << feature_name << " redefine" << std::endl;
+                semant_error(curr_class->get_filename(), curr_feature) << "Attribute " << feature_name << " is multiply  defined in class." << std::endl;
             }
             else {
                 curr_feature->add_attr(curr_attr);
@@ -428,7 +430,7 @@ void ClassTable::add_all_features(Class_ curr_class, SymbolTable<Symbol, Entry> 
 
 void ClassTable::rec_add_features(Class_ curr_class, SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, Feature_class> *curr_method) {
     Symbol par_name = curr_class->getparent();
-    cout << curr_class->getname() << " rec add features " << par_name << std::endl;
+    // cout << curr_class->getname() << " rec add features " << par_name << std::endl;
     Class_ par_class = name2class->lookup(par_name);
     if(curr_class->getname() != Object) {
         rec_add_features(par_class, curr_attr, curr_method);
@@ -437,7 +439,7 @@ void ClassTable::rec_add_features(Class_ curr_class, SymbolTable<Symbol, Entry> 
 }
 
 void ClassTable::scoping_build() {
-    cout << "start coping build" << std::endl;
+    // cout << "start coping build" << std::endl;
     attr_table = new SymbolTable<Symbol, SymbolTable<Symbol, Entry> >();
     attr_table -> enterscope();
     method_table = new SymbolTable<Symbol, SymbolTable<Symbol, Feature_class> >();
@@ -447,7 +449,7 @@ void ClassTable::scoping_build() {
     for(int i = all_classes->first(); all_classes->more(i); i = all_classes->next(i)) {
         Class_ curr_class = all_classes->nth(i);
         Symbol name = curr_class->getname();
-        cout << name << endl;
+        // cout << name << endl;
         curr_attr = new SymbolTable<Symbol, Entry>();
         curr_method = new SymbolTable<Symbol, Feature_class>();
         curr_attr->enterscope();
@@ -457,7 +459,7 @@ void ClassTable::scoping_build() {
             Class_ par_class = name2class->lookup(par_name);
             rec_add_features(par_class, curr_attr, curr_method);
         }
-        cout << name << " add ancestor " << std::endl;
+        // cout << name << " add ancestor " << std::endl;
         curr_attr->enterscope();
         curr_method->enterscope();
         add_all_features(curr_class, curr_attr, curr_method);
@@ -475,14 +477,14 @@ void ClassTable::scoping_build() {
 }
 
 void ClassTable::type_checking() {
-    cout << "ClassTable type checking" << std::endl;
+    // cout << "ClassTable type checking" << std::endl;
     for(int i = all_classes->first(); all_classes->more(i); i = all_classes->next(i)) {
         Class_ curr_class = all_classes->nth(i);
         Symbol name = curr_class->getname();
         if(name == Object || name == Bool || name == IO || name == Int || name == Str) continue;
-        cout << "type checking: Class " << name << std::endl;
+        // cout << "type checking: Class " << name << std::endl;
         curr_class->type_checking(attr_table->lookup(name), method_table->lookup(name), this);
-        cout << std::endl << std::endl;
+        // cout << std::endl << std::endl;
     }
 }
 
@@ -492,7 +494,7 @@ Class_ ClassTable::lookup(Symbol name) {
 
 void class__class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, 
                                 SymbolTable<Symbol, Feature_class> *curr_method, ClassTable* classtable) {
-    cout << "class__class type checking" << std::endl;
+    // cout << "class__class type checking" << std::endl;
     Features curr_features = features;
     Class_ class_i = this;
     Symbol par_name;
@@ -508,7 +510,7 @@ void class__class::type_checking(SymbolTable<Symbol, Entry> *curr_attr,
 }
 
 bool ClassTable::check_inheritance(Symbol s1, Symbol s2) {
-    cout << "check inheritance " << s1 << "  " << s2 << std::endl;
+    // cout << "check inheritance " << s1 << "  " << s2 << std::endl;
     if(s1 == s2 || s1 == No_type) return true;
     Class_ curr_class = name2class->lookup(s1);
     if(curr_class == NULL) return false;
@@ -528,7 +530,7 @@ Symbol ClassTable::lca(Symbol s1, Symbol s2) {
 void attr_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: Attribute " << name << std::endl;
+    // cout << "type checking: Attribute " << name << std::endl;
     init = init->type_checking(curr_attr, curr_method, classtable, curr_class);
     Symbol init_type = init->get_type();
     if(init_type != No_type) {
@@ -539,7 +541,8 @@ void attr_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTabl
             init_type = curr_attr->lookup(self);
         if(classtable->check_inheritance(init_type, rtype) == false) {
             classtable->semant_error(curr_class->get_filename(), this) 
-                << "Identifier " << name << " declared type " << rtype << " but assigned type " << init_type << std::endl;
+                << "Inferred type " << init_type << " of initialization ofo attribute " << name << 
+                    " does not conform to declared type "  << rtype << std::endl;
         }
     }
 }
@@ -547,7 +550,7 @@ void attr_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTabl
 void method_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: Method " << name << std::endl;
+    // cout << "type checking: Method " << name << std::endl;
     curr_attr->enterscope();
     Formal curr_formal;
     for(int i = formals->first(); formals->more(i); i = formals->next(i)) {
@@ -561,13 +564,13 @@ void method_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTa
         rtype = curr_attr->lookup(self);
     }
     if(expr_type == SELF_TYPE) {
-        cout << "expr type is self type" << std::endl;
+        // cout << "expr type is self type" << std::endl;
         expr_type = curr_attr->lookup(self);
     }
-    cout << "check inheritance : " << expr_type << " " << rtype << std::endl;
+    // cout << "check inheritance : " << expr_type << " " << rtype << std::endl;
     if(!classtable->check_inheritance(expr_type, rtype)) {
-        classtable->semant_error(curr_class->get_filename(), this) << "The declared return type of method " << name 
-            << " is " << rtype << " but the type of the method body is " << expr_type << std::endl;
+        classtable->semant_error(curr_class->get_filename(), this) << "Inferred return type " << expr->get_type() << " of method "
+         << name << " does not conform to declared return type " << rtype << std::endl;
     }
     curr_attr->exitscope();
 }
@@ -575,7 +578,7 @@ void method_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTa
 Expression assign_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: assign " << std::endl;
+    // cout << "type checking: assign " << std::endl;
     expr = expr->type_checking(curr_attr, curr_method, classtable, curr_class);
     Symbol expr_type = expr->get_type();
     Symbol rtype = curr_attr->lookup(name);
@@ -584,8 +587,8 @@ Expression assign_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Sy
     }
     else {
         // error handler see PA4 manual
-        classtable->semant_error(curr_class->get_filename(), this) << "Identifier " << name << 
-            " declared type " << rtype << " but assigned type " << expr_type << std::endl;
+        classtable->semant_error(curr_class->get_filename(), this) << "type " << expr_type << " of assigned expression does not conform to declared type"
+            << rtype << " of identifier " << name << std::endl;
         return set_type(Object);
     }
 }
@@ -597,7 +600,7 @@ Feature ClassTable::get_def_method(Symbol class_name, Symbol name) {
 Expression static_dispatch_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: static dispatch " << std::endl;
+    // cout << "type checking: static dispatch " << std::endl;
     if(!classtable->check_typerror(curr_class->get_filename(), type_name, this)) {
         return set_type(Object);
     }
@@ -605,15 +608,16 @@ Expression static_dispatch_class::type_checking(SymbolTable<Symbol, Entry> *curr
     Symbol expr_type = expr->get_type();
     if(expr_type == SELF_TYPE)
         expr_type = curr_attr->lookup(self);
-    if(classtable->check_inheritance(expr_type, type_name)) {
+    if(!classtable->check_inheritance(expr_type, type_name)) {
         // definition of static dispatch <expr>@<type>.id(<expr>,...,<expr>) to 
         // call methods of parent classes that have been hidden by redefinitions in child classes
         classtable->semant_error(curr_class->get_filename(), this) 
-            << "The caller is not of type " << type_name << std::endl;
+            << "Expression type " << expr_type << " does not conform to declared static dispatch type " << type_name << std::endl;
     }
     Feature def_method = classtable->get_def_method(expr_type, name);
     if(def_method == NULL) {
-        classtable->semant_error(curr_class->get_filename(), this) << "The caller is not of type " << type_name << std::endl;
+        classtable->semant_error(curr_class->get_filename(), this) << "Dispatch to undefined method " << name << std::endl;
+        return set_type(Object);
     }
     Expression typed_expr;
     Expressions new_actual;
@@ -621,12 +625,14 @@ Expression static_dispatch_class::type_checking(SymbolTable<Symbol, Entry> *curr
     for(i = actual->first(); actual->more(i); i = actual->next(i)) {
         if(!def_method->getformals()->more(i)) {
             classtable->semant_error(curr_class->get_filename(), this) << 
-                "Number of parameters is not the same of declared" << std::endl;
+                "Method " << name << " called with wrong number of arguments." << std::endl;
             return set_type(Object);
         }
         typed_expr = actual->nth(i)->type_checking(curr_attr, curr_method, classtable, curr_class);
         if(classtable->check_inheritance(typed_expr->get_type(), def_method->getformals()->nth(i)->gettype()) == false) {
-            classtable->semant_error(curr_class->get_filename(), this) << "Parameters are not of the types declared." << std::endl;
+            classtable->semant_error(curr_class->get_filename(), this) << "In call of method " << name << 
+                ", type " << typed_expr->get_type() << " of parameter " << def_method->getformals()->nth(i)->getname()
+                 << " does not conform to declared type " << def_method->getformals()->nth(i)->gettype() << "." << std::endl;
             typed_expr = typed_expr->set_type(Object);
         }
         if(i == actual->first())
@@ -635,7 +641,7 @@ Expression static_dispatch_class::type_checking(SymbolTable<Symbol, Entry> *curr
     }
     if(def_method->getformals()->more(i)) {
         classtable->semant_error(curr_class->get_filename(), this) << 
-            "Number of parameters is not the same of declared" << std::endl;
+            "Method " << name << " called with wrong number of arguments." << std::endl;
         return set_type(Object);
     }
     actual = new_actual;
@@ -648,14 +654,15 @@ Expression static_dispatch_class::type_checking(SymbolTable<Symbol, Entry> *curr
 Expression dispatch_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: dispatch " << curr_class->getname() << " " << name << std::endl;
+    // cout << "type checking: dispatch " << curr_class->getname() << " " << name << std::endl;
     expr = expr->type_checking(curr_attr, curr_method, classtable, curr_class);
     Symbol expr_type = expr->get_type();
     if(expr_type == SELF_TYPE)
         expr_type = curr_attr->lookup(self);
     Feature def_method = classtable->get_def_method(expr_type, name);
     if(def_method == NULL) {
-        classtable->semant_error(curr_class->get_filename(), this) << "The caller is not of type " << name << std::endl;
+        classtable->semant_error(curr_class->get_filename(), this) << "Dispatch to undefined method " << name << std::endl;
+        return set_type(Object);
     }
     Expression typed_expr;
     Expressions new_actual;
@@ -663,12 +670,14 @@ Expression dispatch_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, 
     for(i = actual->first(); actual->more(i); i = actual->next(i)) {
         if(!def_method->getformals()->more(i)) {
             classtable->semant_error(curr_class->get_filename(), this) << 
-                "Number of parameters is not the same of declared" << std::endl;
+                "Method " << name << " called with wrong number of arguments." << std::endl;
             return set_type(Object);
         }
         typed_expr = actual->nth(i)->type_checking(curr_attr, curr_method, classtable, curr_class);
         if(classtable->check_inheritance(typed_expr->get_type(), def_method->getformals()->nth(i)->gettype()) == false) {
-            classtable->semant_error(curr_class->get_filename(), this) << "Parameters are not of the types declared." << std::endl;
+            classtable->semant_error(curr_class->get_filename(), this) << "In call of method " << name << 
+                ", type " << typed_expr->get_type() << " of parameter " << def_method->getformals()->nth(i)->getname()
+                 << " does not conform to declared type " << def_method->getformals()->nth(i)->gettype() << "." << std::endl;
             typed_expr = typed_expr->set_type(Object);
         }
         if(i == actual->first())
@@ -677,7 +686,7 @@ Expression dispatch_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, 
     }
     if(def_method->getformals()->more(i)) {
         classtable->semant_error(curr_class->get_filename(), this) << 
-            "Number of parameters is not the same of declared" << std::endl;
+            "Method " << name << " called with wrong number of arguments." << std::endl;
         return set_type(Object);
     }
     actual = new_actual;
@@ -690,10 +699,10 @@ Expression dispatch_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, 
 Expression cond_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: condition " << std::endl;
+    // cout << "type checking: condition " << std::endl;
     pred = pred->type_checking(curr_attr, curr_method, classtable, curr_class);
     if(pred->get_type() != Bool) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Predicate is not of type Bool." << std::endl;
+        classtable->semant_error(curr_class->get_filename(), this) << "Predicate of 'if' does not have type Bool." << std::endl;
         return set_type(Object);
     }
     then_exp = then_exp->type_checking(curr_attr, curr_method, classtable, curr_class);
@@ -704,10 +713,10 @@ Expression cond_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symb
 Expression loop_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: loop " << std::endl;
+    // cout << "type checking: loop " << std::endl;
     pred = pred->type_checking(curr_attr, curr_method, classtable, curr_class);
     if(pred->get_type() != Bool) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Predicate is not of type Bool." << std::endl;
+        classtable->semant_error(curr_class->get_filename(), this) << "Loop condition does not have type Bool." << std::endl;
         return set_type(Object);
     }
     body = body->type_checking(curr_attr, curr_method, classtable, curr_class);
@@ -717,11 +726,10 @@ Expression loop_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symb
 Expression typcase_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: case " << std::endl;
+    // cout << "type checking: case " << "line number " << line_number << std::endl;
     Expression typed_expr;
     expr = expr->type_checking(curr_attr, curr_method, classtable, curr_class);
     Symbol curr_type;
-    Cases new_case;
     Symbol rtype;
     List<Entry> *type_list = NULL;
     for(int i = cases->first(); cases->more(i); i = cases->next(i)) {
@@ -731,7 +739,7 @@ Expression typcase_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, S
         for(List<Entry> *l = type_list; l; l = l->tl()) {
             if(l->hd() == curr_type) {
                 classtable->semant_error(curr_class->get_filename(), this) << 
-                                "Type " << curr_type << " appears multiple times." << std::endl;
+                                "Duplicate branch " << curr_type << " in case statement." << std::endl;
                 return set_type(Object);
             }
         }
@@ -747,21 +755,18 @@ Expression typcase_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, S
         }
         if(i == cases->first()) {
             rtype = typed_expr->get_type();
-            new_case = single_Cases(branch(curr_case->getname(), curr_type, typed_expr));
         }
         else {
             rtype = classtable->lca(rtype, typed_expr->get_type());
-            new_case = append_Cases(new_case, single_Cases(branch(curr_case->getname(), curr_type, typed_expr)));
         }
     }
-    cases = new_case;
     return set_type(rtype);
 }
 
 Expression block_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: block " << std::endl;
+    // cout << "type checking: block " << std::endl;
     Expressions new_body;
     Expression typed_expr;
     for(int i = body->first(); body->more(i); i = body->next(i)) {
@@ -779,15 +784,11 @@ Expression block_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Sym
 Expression plus_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: plus " << std::endl;
+    // cout << "type checking: plus " << std::endl;
     e1 = e1->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e1->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Left part of + is not of type Int. " << std::endl;
-        return set_type(Object);
-    }
     e2 = e2->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e2->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Right part of + is not of type Int. " << std::endl;
+    if(e1->get_type() != Int || e2->get_type() != Int) {
+        classtable->semant_error(curr_class->get_filename(), this) << "non-Int arguments: " << e1->get_type() << " + " << e2->get_type() << std::endl;
         return set_type(Object);
     }
     return set_type(Int);
@@ -796,15 +797,11 @@ Expression plus_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symb
 Expression sub_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: sub " << std::endl;
+    // cout << "type checking: sub " << std::endl;
     e1 = e1->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e1->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Left part of - is not of type Int. " << std::endl;
-        return set_type(Object);
-    }
     e2 = e2->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e2->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Right part of - is not of type Int. " << std::endl;
+    if(e1->get_type() != Int || e2->get_type() != Int) {
+        classtable->semant_error(curr_class->get_filename(), this) << "non-Int arguments: " << e1->get_type() << " - " << e2->get_type() << std::endl;
         return set_type(Object);
     }
     return set_type(Int);
@@ -813,15 +810,11 @@ Expression sub_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symbo
 Expression mul_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: mul " << std::endl;
+    // cout << "type checking: mul " << std::endl;
     e1 = e1->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e1->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Left part of * is not of type Int. " << std::endl;
-        return set_type(Object);
-    }
     e2 = e2->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e2->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Right part of * is not of type Int. " << std::endl;
+    if(e1->get_type() != Int || e2->get_type() != Int) {
+        classtable->semant_error(curr_class->get_filename(), this) << "non-Int arguments: " << e1->get_type() << " * " << e2->get_type() << std::endl;
         return set_type(Object);
     }
     return set_type(Int);
@@ -830,15 +823,11 @@ Expression mul_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symbo
 Expression divide_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: divide " << std::endl;
+    // cout << "type checking: divide " << std::endl;
     e1 = e1->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e1->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Left part of / is not of type Int. " << std::endl;
-        return set_type(Object);
-    }
     e2 = e2->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e2->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Right part of / is not of type Int. " << std::endl;
+    if(e1->get_type() != Int || e2->get_type() != Int) {
+        classtable->semant_error(curr_class->get_filename(), this) << "non-Int arguments: " << e1->get_type() << " / " << e2->get_type() << std::endl;
         return set_type(Object);
     }
     return set_type(Int);
@@ -847,10 +836,10 @@ Expression divide_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Sy
 Expression neg_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: neg " << std::endl;
+    // cout << "type checking: neg " << std::endl;
     e1 = e1->type_checking(curr_attr, curr_method, classtable, curr_class);
     if(e1->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Left part of ~ is not of type Int. " << std::endl;
+        classtable->semant_error(curr_class->get_filename(), this) << "Argument of '~' has type " << e1->get_type() << " instead of Int." << std::endl;
         return set_type(Object);
     }
     return set_type(Int);
@@ -859,15 +848,11 @@ Expression neg_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symbo
 Expression lt_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: lt " << std::endl;
+    // cout << "type checking: lt " << std::endl;
     e1 = e1->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e1->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Left part of < is not of type Int. " << std::endl;
-        return set_type(Object);
-    }
     e2 = e2->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e2->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Right part of < is not of type Int. " << std::endl;
+    if(e1->get_type() != Int || e2->get_type() != Int) {
+        classtable->semant_error(curr_class->get_filename(), this) << "non-Int arguments: " << e1->get_type() << " < " << e2->get_type() << std::endl;
         return set_type(Object);
     }
     return set_type(Bool);
@@ -876,51 +861,32 @@ Expression lt_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symbol
 Expression eq_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: eq " << std::endl;
+    // cout << "type checking: eq " << std::endl;
     e1 = e1->type_checking(curr_attr, curr_method, classtable, curr_class);
     e2 = e2->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e1->get_type() == Int) {
-        if(e2->get_type() != Int) {
-            classtable->semant_error(curr_class->get_filename(), this) << "Right part of = is not of type Int. " << std::endl;
+    if(e1->get_type() == Int || e1->get_type() == Bool || e1->get_type() == Str) {
+        if(e2->get_type() != e1->get_type()) {
+            classtable->semant_error(curr_class->get_filename(), this) << "Illegal comparison with a basic type." << std::endl;
             return set_type(Object);
         }
         else
             return set_type(Bool);
     }
-    else if(e1->get_type() == Bool) {
-        if(e2->get_type() != Bool) {
-            classtable->semant_error(curr_class->get_filename(), this) << "Right part of = is not of type Bool. " << std::endl;
-            return set_type(Object);
-        }
-        else
-            return set_type(Bool);
+    else if(e2->get_type() == Int || e2->get_type() == Bool || e2->get_type() == Str) {
+        classtable->semant_error(curr_class->get_filename(), this) << "Illegal comparison with a basic type." << std::endl;
+        return set_type(Object);
     }
-    else if(e1->get_type() == Str) {
-        if(e2->get_type() != Str) {
-            classtable->semant_error(curr_class->get_filename(), this) << "Right part of = is not of type Str. " << std::endl;
-            return set_type(Object);
-        }
-        else
-            return set_type(Bool);
-    }
-    else {
-            classtable->semant_error(curr_class->get_filename(), this) << "Left part of = is not of type Int or Bool or Str. " << std::endl;
-            return set_type(Object);
-    }
+    return set_type(Object);
 }
 
 Expression leq_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: leq " << std::endl;
+    // cout << "type checking: leq " << std::endl;
     e1 = e1->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e1->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Left part of <= is not of type Int. " << std::endl;
-        return set_type(Object);
-    }
     e2 = e2->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e2->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Right part of <= is not of type Int. " << std::endl;
+    if(e1->get_type() != Int || e2->get_type() != Int) {
+        classtable->semant_error(curr_class->get_filename(), this) << "non-Int arguments: " << e1->get_type() << " < " << e2->get_type() << std::endl;
         return set_type(Object);
     }
     return set_type(Bool);
@@ -929,10 +895,10 @@ Expression leq_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symbo
 Expression comp_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: comp " << std::endl;
+    // cout << "type checking: comp " << std::endl;
     e1 = e1->type_checking(curr_attr, curr_method, classtable, curr_class);
-    if(e1->get_type() != Int) {
-        classtable->semant_error(curr_class->get_filename(), this) << "Left part of \"not\" is not of type Int. " << std::endl;
+    if(e1->get_type() != Bool) {
+        classtable->semant_error(curr_class->get_filename(), this) << "Argument of 'not' has type" << e1->get_type() << " instead of Bool." << std::endl;
         return set_type(Object);
     }
     return set_type(Bool);
@@ -941,28 +907,28 @@ Expression comp_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symb
 Expression int_const_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: int const " << std::endl;
+    // // cout << "type checking: int const " << std::endl;
     return set_type(Int);
 }
 
 Expression bool_const_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: bool const " << std::endl;
+    // cout << "type checking: bool const " << std::endl;
     return set_type(Bool);
 }
 
 Expression string_const_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: string const " << std::endl;
+    // cout << "type checking: string const " << std::endl;
     return set_type(Str);
 }
 
 Expression new__class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: new " << std::endl;
+    // cout << "type checking: new " << std::endl;
     if(!classtable->check_typerror(curr_class->get_filename(), type_name, this))
         return set_type(Object);
     else
@@ -972,21 +938,21 @@ Expression new__class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symb
 Expression isvoid_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: is void " << std::endl;
+    // cout << "type checking: is void " << std::endl;
     return set_type(Bool);
 }
 
 Expression no_expr_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: no expr " << std::endl;
+    // cout << "type checking: no expr " << std::endl;
     return set_type(No_type);
 }
 
 Expression object_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: object " << name << std::endl;
+    // cout << "type checking: object " << name << std::endl;
     if(name == self) return set_type(SELF_TYPE);
     return set_type(curr_attr->lookup(name));
 }
@@ -994,7 +960,7 @@ Expression object_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Sy
 Expression let_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, SymbolTable<Symbol, 
                                Feature_class> *curr_method, ClassTable* classtable,
                                Class_ curr_class) {
-    cout << "type checking: let " << std::endl;
+    // cout << "type checking: let " << std::endl;
     if(identifier == self) {
         classtable->semant_error(curr_class->get_filename(), this) << 
                 "self is not allowed to appear in a let binding." << std::endl;
@@ -1038,7 +1004,7 @@ Expression let_class::type_checking(SymbolTable<Symbol, Entry> *curr_attr, Symbo
 void program_class::semant()
 {
     initialize_constants();
-    cout << "OK" << std::endl;
+    // cout << "OK" << std::endl;
 
     /* ClassTable constructor may do some semantic analysis */
     ClassTable *classtable = new ClassTable(classes);
