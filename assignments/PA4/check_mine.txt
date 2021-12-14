@@ -7,9 +7,9 @@ IO is child of Object
 Int is child of Object
 Bool is child of Object
 String is child of Object
-A is child of B
-B is child of A
+C is child of Object
+C is child of Object
+Main is child of Object
 start check cycle
 check cycle
-false check
 finish build

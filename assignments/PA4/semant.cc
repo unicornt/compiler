@@ -119,6 +119,9 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
             name2class -> addid(name_i, class_i);
         }
     }
+    if(name2id->lookup(Main) == NULL) {
+        semant_error() << "Class Main is not defined" << std::endl;
+    }
     int *par_i, *id;
     cout << "build class table" << std::endl;
     for(int i = all_classes->first(), j = 0; all_classes->more(i); i = all_classes->next(i)) {
@@ -461,7 +464,7 @@ void ClassTable::scoping_build() {
         curr_attr->addid(self, name); // add self attribute
         if(name == Main) {
             if(curr_method->probe(main_meth) == NULL) {
-                semant_error(curr_class->get_filename(), curr_class) << "Method main is not defined.\n";
+                semant_error(curr_class->get_filename(), curr_class) << "No 'main' method in class Main.\n";
             }
             else if (curr_method->probe(main_meth)->getformals()->len() != 0)
                 semant_error(curr_class->get_filename(), curr_class) << "Method main should take no formal parameters.\n";
