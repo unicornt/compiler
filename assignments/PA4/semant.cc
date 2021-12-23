@@ -423,6 +423,7 @@ void ClassTable::add_all_features(Class_ curr_class, SymbolTable<Symbol, Entry> 
             }
             else {
                 // handle error
+                semant_error(curr_class->get_filename(), curr_feature) << "Method " << feature_name << " is multiply  defined in class." << std::endl;
             }
         }
     }
